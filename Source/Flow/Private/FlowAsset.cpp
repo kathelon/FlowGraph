@@ -778,7 +778,17 @@ void UFlowAsset::FinishNode(UFlowNode* Node)
 			}
 			else
 			{
-				FinishFlow(EFlowFinishPolicy::Keep);
+				//If this is a root instance finish root flows else finish locally 
+				TSet<UFlowAsset*> RootFlowInstances = GetFlowSubsystem()->GetRootInstancesByOwner(Owner.Get());
+
+				if (RootFlowInstances.Contains(this))
+				{
+				    GetFlowSubsystem()->FinishRootFlow(Owner.Get(), TemplateAsset, EFlowFinishPolicy::Keep);
+				}
+				else
+				{
+				    FinishFlow(EFlowFinishPolicy::Keep);
+				}
 			}
 		}
 	}
