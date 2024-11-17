@@ -17,7 +17,7 @@ UFlowNode_CallOwnerFunction::UFlowNode_CallOwnerFunction(const FObjectInitialize
 	, Params(nullptr)
 {
 #if WITH_EDITOR
-	NodeDisplayStyle = TAG_Flow_NodeDisplayStyle_Node_Deprecated;
+	NodeDisplayStyle = FlowNodeStyle::Deprecated;
 	Category = TEXT("World");
 #endif // WITH_EDITOR
 }

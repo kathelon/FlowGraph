@@ -37,7 +37,7 @@ UFlowNode_PlayLevelSequence::UFlowNode_PlayLevelSequence(const FObjectInitialize
 {
 #if WITH_EDITOR
 	Category = TEXT("World");
-	NodeDisplayStyle = TAG_Flow_NodeDisplayStyle_Node_Latent;
+	NodeDisplayStyle = FlowNodeStyle::Latent;
 #endif
 
 	InputPins.Empty();

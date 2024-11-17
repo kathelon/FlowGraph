@@ -36,8 +36,6 @@ UFlowNode::UFlowNode(const FObjectInitializer& ObjectInitializer)
 {
 #if WITH_EDITOR
 	Category = TEXT("Uncategorized");
-	NodeDisplayStyle = TAG_Flow_NodeDisplayStyle_Node;
-	NodeColor = FLinearColor::Black;
 #endif
 
 	InputPins = {DefaultInputPin};
