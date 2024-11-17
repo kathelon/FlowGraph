@@ -6,7 +6,7 @@ public class FlowEditor : ModuleRules
 {
 	public FlowEditor(ReadOnlyTargetRules target) : base(target)
 	{
-		if(CppStandard is null || CppStandard != CppStandardVersion.Cpp20)
+		if (CppStandard is null || CppStandard != CppStandardVersion.Cpp20)
 		{
 			CppStandard = CppStandardVersion.Cpp20;
 		}
@@ -38,6 +38,7 @@ public class FlowEditor : ModuleRules
 			"EditorStyle",
 			"Engine",
 			"GraphEditor",
+			"GameplayTags",
 			"InputCore",
 			"Json",
 			"JsonUtilities",
@@ -56,6 +57,7 @@ public class FlowEditor : ModuleRules
 			"Slate",
 			"SlateCore",
 			"SourceControl",
+			"StructUtils",
 			"ToolMenus",
 			"UnrealEd"
 		});

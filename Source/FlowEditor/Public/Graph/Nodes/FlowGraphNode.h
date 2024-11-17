@@ -14,6 +14,8 @@ class UEdGraphSchema;
 class UFlowGraph;
 class UFlowNodeBase;
 class UFlowNode;
+class UFlowAsset;
+class FFlowMessageLog;
 
 DECLARE_DELEGATE(FFlowGraphNodeEvent);
 
@@ -34,6 +36,7 @@ private:
 	UFlowNodeBase* NodeInstance;
 
 	bool bBlueprintCompilationPending;
+	bool bIsReconstructingNode;
 	bool bNeedsFullReconstruction;
 	static bool bFlowAssetsLoaded;
 
@@ -113,7 +116,7 @@ public:
 
 	void CreateAttachAddOnSubMenu(UToolMenu* Menu, UEdGraph* Graph) const;
 
-	bool CanAcceptSubNodeAsChild(const UFlowGraphNode& OtherSubNode, FString* OutReasonString = nullptr) const;
+	bool CanAcceptSubNodeAsChild(const UFlowGraphNode& OtherSubNode, const TSet<const UEdGraphNode*>& AllRootSubNodesToPaste, FString* OutReasonString = nullptr) const;
 
 	bool IsAncestorNode(const UFlowGraphNode& OtherNode) const;
 
@@ -126,6 +129,8 @@ public:
 
 	// Get flow node for the inspected asset instance
 	UFlowNode* GetInspectedNodeInstance() const;
+
+	UFlowAsset* GetFlowAsset() const;
 
 	// Used for highlighting active nodes of the inspected asset instance
 	EFlowNodeState GetActivationState() const;
@@ -144,6 +149,11 @@ public:
 	virtual void JumpToDefinition() const override;
 	virtual bool SupportsCommentBubble() const override;
 	// --
+
+	/** check if node has any errors, used for assigning colors on graph */
+	virtual bool HasErrors() const;
+
+	void ValidateGraphNode(FFlowMessageLog& MessageLog) const;
 
 //////////////////////////////////////////////////////////////////////////
 // Pins
@@ -183,6 +193,14 @@ public:
 	// UEdGraphNode
 	virtual void GetPinHoverText(const UEdGraphPin& Pin, FString& HoverTextOut) const override;
 	// --
+
+	// @return true, if pins cannot be connected due to node's inner logic, put message for user in OutReason
+	virtual bool IsConnectionDisallowed(const UEdGraphPin* MyPin, const UEdGraphPin* OtherPin, FString& OutReason) const { return false; }
+
+protected:
+	// Gets the PinCategory from the FlowPin
+	// (accounting for FFlowPin structs that predate the PinCategory field)
+	const FName& GetPinCategoryFromFlowPin(const FFlowPin& FlowPin) const;
 
 //////////////////////////////////////////////////////////////////////////
 // Breakpoints
@@ -274,14 +292,13 @@ public:
 	/** Check if node instance uses blueprint for its implementation */
 	bool UsesBlueprint() const;
 
-	/** check if node has any errors, used for assigning colors on graph */
-	virtual bool HasErrors() const;
-	
 protected:
 
 	virtual void ResetNodeOwner();
 
 	void LogError(const FString& MessageToLog, const UFlowNodeBase* FlowNodeBase) const;
+
+	bool HavePinsChanged();
 
 public:
 	
