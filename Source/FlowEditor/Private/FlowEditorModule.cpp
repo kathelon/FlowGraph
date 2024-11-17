@@ -3,7 +3,6 @@
 #include "FlowEditorModule.h"
 #include "FlowEditorStyle.h"
 
-#include "Asset/AssetTypeActions_FlowAsset.h"
 #include "Asset/FlowAssetEditor.h"
 #include "Asset/FlowAssetIndexer.h"
 #include "Graph/FlowGraphConnectionDrawingPolicy.h"
@@ -56,6 +55,7 @@ static FName AssetSearchModuleName = TEXT("AssetSearch");
 #define LOCTEXT_NAMESPACE "FlowEditorModule"
 
 EAssetTypeCategories::Type FFlowEditorModule::FlowAssetCategory = static_cast<EAssetTypeCategories::Type>(0);
+FAssetCategoryPath FFLowAssetCategoryPaths::Flow(LOCTEXT("Flow", "Flow"));
 
 void FFlowEditorModule::StartupModule()
 {
@@ -165,10 +165,6 @@ void FFlowEditorModule::RegisterAssets()
 			FlowAssetCategory = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("Flow")), AssetCategoryText);
 		}
 	}
-
-	const TSharedRef<IAssetTypeActions> FlowAssetActions = MakeShareable(new FAssetTypeActions_FlowAsset());
-	RegisteredAssetActions.Add(FlowAssetActions);
-	AssetTools.RegisterAssetTypeActions(FlowAssetActions);
 
 	const TSharedRef<IAssetTypeActions> FlowNodeActions = MakeShareable(new FAssetTypeActions_FlowNodeBlueprint());
 	RegisteredAssetActions.Add(FlowNodeActions);
