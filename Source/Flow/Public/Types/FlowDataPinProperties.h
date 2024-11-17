@@ -8,10 +8,10 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "UObject/Class.h"
 
-#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 5
-#include "StructUtils/InstancedStruct.h"
-#else
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 5
 #include "InstancedStruct.h"
+#else
+#include "StructUtils/InstancedStruct.h"
 #endif
 
 #include "FlowDataPinProperties.generated.h"
