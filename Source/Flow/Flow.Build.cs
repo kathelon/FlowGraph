@@ -10,12 +10,9 @@ public class Flow : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new[]
 		{
-			"LevelSequence"
+			"LevelSequence",
+			"StructUtils",
 		});
-		
-#if UE_5_4_OR_EARLIER
-		PublicDependencyModuleNames.AddRange("StructUtils");
-#endif
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
