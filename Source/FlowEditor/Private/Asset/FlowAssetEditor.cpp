@@ -451,6 +451,7 @@ void FFlowAssetEditor::ValidateAsset_Internal()
 		ValidationLogListing->AddMessages(LogResults.Messages);
 	}
 	ValidationLogListing->OnDataChanged().Broadcast();
+	FlowAsset->GetGraph()->NotifyGraphChanged();
 }
 
 void FFlowAssetEditor::ValidateAsset(FFlowMessageLog& MessageLog)
