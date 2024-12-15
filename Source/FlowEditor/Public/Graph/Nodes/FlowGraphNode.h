@@ -204,7 +204,7 @@ public:
 protected:
 	// Gets the PinCategory from the FlowPin
 	// (accounting for FFlowPin structs that predate the PinCategory field)
-	const FName& GetPinCategoryFromFlowPin(const FFlowPin& FlowPin) const;
+	static const FName& GetPinCategoryFromFlowPin(const FFlowPin& FlowPin);
 
 //////////////////////////////////////////////////////////////////////////
 // Breakpoints
