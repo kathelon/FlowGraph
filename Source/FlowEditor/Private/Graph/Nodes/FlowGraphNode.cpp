@@ -577,7 +577,7 @@ void UFlowGraphNode::CreateAttachAddOnSubMenu(UToolMenu* Menu, UEdGraph* Graph) 
 {
 	UFlowGraphNode* MutableThis = const_cast<UFlowGraphNode*>(this);
 
-	TSharedRef<SGraphEditorActionMenuFlow> Widget =
+	const TSharedRef<SGraphEditorActionMenuFlow> Widget =
 		SNew(SGraphEditorActionMenuFlow)
 		.GraphObj(Graph)
 		.GraphNode(MutableThis)
@@ -593,7 +593,28 @@ bool UFlowGraphNode::CanUserDeleteNode() const
 
 bool UFlowGraphNode::CanDuplicateNode() const
 {
-	return NodeInstance ? NodeInstance->bCanDuplicate : Super::CanDuplicateNode();
+	if (NodeInstance)
+	{
+		return NodeInstance->bCanDuplicate;
+	}
+
+	// support code paths calling this method on CDO, where there's no Flow Node Instance
+	if (AssignedNodeClasses.Num() > 0)
+	{
+		// we simply allow action if any Assigned Node Class accepts it, as the action is disallowed in special node likes StartNode
+		for (const UClass* Class : AssignedNodeClasses)
+		{
+			const UFlowNode* NodeDefaults = Class->GetDefaultObject<UFlowNode>();
+			if (NodeDefaults && NodeDefaults->bCanDuplicate)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	return true;
 }
 
 TSharedPtr<SGraphNode> UFlowGraphNode::CreateVisualWidget()
@@ -1024,7 +1045,7 @@ void UFlowGraphNode::RefreshContextPins(const bool bReconstructNode)
 		// We don't have contextual pins to account for; or the contextual pins have not changed. We can skip now. 
 		return;
 	}
-		
+
 	const FScopedTransaction Transaction(LOCTEXT("RefreshContextPins", "Refresh Context Pins"));
 	Modify();
 
@@ -1264,7 +1285,7 @@ void UFlowGraphNode::LogError(const FString& MessageToLog, const UFlowNodeBase* 
 
 bool UFlowGraphNode::HavePinsChanged()
 {
-	const UFlowNode* FlowNodeInstance = Cast<UFlowNode>(NodeInstance);	
+	const UFlowNode* FlowNodeInstance = Cast<UFlowNode>(NodeInstance);
 	if (!IsValid(FlowNodeInstance))
 	{
 		// default to having changed because we don't have a way to confirm that the pins have remained intact. 
@@ -1288,7 +1309,7 @@ bool UFlowGraphNode::HavePinsChanged()
 		// There is a different number of EdGraphPins and Flow Node pins; something changed.
 		return true;
 	}
-	
+
 	TArray<FName> PinNames;
 	for (const UEdGraphPin* Pin : Pins)
 	{
@@ -1306,7 +1327,7 @@ bool UFlowGraphNode::HavePinsChanged()
 	}
 
 	// Nothing changed
-	return false;	
+	return false;
 }
 
 void UFlowGraphNode::ResetNodeOwner()
@@ -1720,7 +1741,7 @@ void UFlowGraphNode::ValidateGraphNode(FFlowMessageLog& MessageLog) const
 		for (UEdGraphPin* const ConnectedPin : EdGraphPin->LinkedTo)
 		{
 			const FPinConnectionResponse Response = Schema->CanCreateConnection(ConnectedPin, EdGraphPin);
-			
+
 			if (!Response.CanSafeConnect())
 			{
 				MessageLog.Error<UFlowNodeBase>(*FString::Printf(TEXT("Pin %s has invalid connection: %s"), *EdGraphPin->GetName(), *Response.Message.ToString()), NodeInstance);
@@ -1765,7 +1786,7 @@ bool UFlowGraphNode::CanAcceptSubNodeAsChild(const UFlowGraphNode& SubNodeToCons
 		{
 			*OutReasonString = TEXT("Cannot be a AddOn of one of our own AddOns");
 		}
-	
+
 		return false;
 	}
 
