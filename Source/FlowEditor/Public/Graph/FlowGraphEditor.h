@@ -71,7 +71,7 @@ protected:
 	virtual bool CanDeleteNodes() const;
 
 	virtual void CopySelectedNodes() const;
-	void PrepareFlowGraphNodeForCopy(UFlowGraphNode& FlowGraphNode, int32 ParentEdNodeIndex, FGraphPanelSelectionSet& NewSelectedNodes) const;
+	static void PrepareFlowGraphNodeForCopy(UFlowGraphNode& FlowGraphNode, const int32 ParentEdNodeIndex, FGraphPanelSelectionSet& NewSelectedNodes);
 	virtual bool CanCopyNodes() const;
 
 	virtual void CutSelectedNodes();
@@ -79,8 +79,8 @@ protected:
 
 	virtual void PasteNodes();
 
-	bool CanPasteNodesAsSubNodes(const TSet<UEdGraphNode*>& NodesToPaste, const UFlowGraphNode& PasteTargetNode) const;
-	TSet<UEdGraphNode*> ImportNodesToPasteFromClipboard(UFlowGraph& FlowGraph, FString& OutTextToImport) const;
+	static bool CanPasteNodesAsSubNodes(const TSet<UEdGraphNode*>& NodesToPaste, const UFlowGraphNode& PasteTargetNode);
+	static TSet<UEdGraphNode*> ImportNodesToPasteFromClipboard(UFlowGraph& FlowGraph, FString& OutTextToImport);
 	TArray<UFlowGraphNode*> DerivePasteTargetNodesFromSelectedNodes() const;
 
 public:
