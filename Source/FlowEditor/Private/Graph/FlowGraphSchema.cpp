@@ -29,7 +29,6 @@
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet/BlueprintTypeConversions.h"
 #include "Kismet2/KismetEditorUtilities.h"
-#include "Misc/DefaultValueHelper.h"
 #include "ScopedTransaction.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(FlowGraphSchema)
@@ -254,7 +253,7 @@ void UFlowGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 	// Start node
 	CreateDefaultNode(Graph, AssetClassDefaults, UFlowNode_Start::StaticClass(), NodeOffset, AssetClassDefaults->bStartNodePlacedAsGhostNode);
 
-	// Add default nodes for all of the CustomInputs
+	// Add default nodes for all the CustomInputs
 	if (IsValid(AssetClassDefaults))
 	{
 		for (const FName& CustomInputName : AssetClassDefaults->CustomInputs)
@@ -268,7 +267,6 @@ void UFlowGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 	}
 
 	UFlowAsset* FlowAsset = CastChecked<UFlowGraph>(&Graph)->GetFlowAsset();
-
 	FlowAsset->HarvestNodeConnections();
 }
 
@@ -707,45 +705,37 @@ void UFlowGraphSchema::ConstructBasicPinTooltip(const UEdGraphPin& Pin, const FT
 		return;
 	}
 
-	constexpr bool bGeneratingDocumentation = false;
-	if (bGeneratingDocumentation)
+	FFormatNamedArguments Args;
+	Args.Add(TEXT("PinType"), UEdGraphSchema_K2::TypeToText(Pin.PinType));
+
+	if (UEdGraphNode* PinNode = Pin.GetOwningNode())
 	{
-		TooltipOut = PinDescription.ToString();
+		UEdGraphSchema_K2 const* const K2Schema = Cast<const UEdGraphSchema_K2>(PinNode->GetSchema());
+		if (ensure(K2Schema != nullptr)) // ensure that this node belongs to this schema
+		{
+			Args.Add(TEXT("DisplayName"), GetPinDisplayName(&Pin));
+			Args.Add(TEXT("LineFeed1"), FText::FromString(TEXT("\n")));
+		}
 	}
 	else
 	{
-		FFormatNamedArguments Args;
-		Args.Add(TEXT("PinType"), UEdGraphSchema_K2::TypeToText(Pin.PinType));
-
-		if (UEdGraphNode* PinNode = Pin.GetOwningNode())
-		{
-			UEdGraphSchema_K2 const* const K2Schema = Cast<const UEdGraphSchema_K2>(PinNode->GetSchema());
-			if (ensure(K2Schema != nullptr)) // ensure that this node belongs to this schema
-			{
-				Args.Add(TEXT("DisplayName"), GetPinDisplayName(&Pin));
-				Args.Add(TEXT("LineFeed1"), FText::FromString(TEXT("\n")));
-			}
-		}
-		else
-		{
-			Args.Add(TEXT("DisplayName"), FText::GetEmpty());
-			Args.Add(TEXT("LineFeed1"), FText::GetEmpty());
-		}
-
-
-		if (!PinDescription.IsEmpty())
-		{
-			Args.Add(TEXT("Description"), PinDescription);
-			Args.Add(TEXT("LineFeed2"), FText::FromString(TEXT("\n\n")));
-		}
-		else
-		{
-			Args.Add(TEXT("Description"), FText::GetEmpty());
-			Args.Add(TEXT("LineFeed2"), FText::GetEmpty());
-		}
-	
-		TooltipOut = FText::Format(LOCTEXT("PinTooltip", "{DisplayName}{LineFeed1}{PinType}{LineFeed2}{Description}"), Args).ToString(); 
+		Args.Add(TEXT("DisplayName"), FText::GetEmpty());
+		Args.Add(TEXT("LineFeed1"), FText::GetEmpty());
 	}
+
+
+	if (!PinDescription.IsEmpty())
+	{
+		Args.Add(TEXT("Description"), PinDescription);
+		Args.Add(TEXT("LineFeed2"), FText::FromString(TEXT("\n\n")));
+	}
+	else
+	{
+		Args.Add(TEXT("Description"), FText::GetEmpty());
+		Args.Add(TEXT("LineFeed2"), FText::GetEmpty());
+	}
+
+	TooltipOut = FText::Format(LOCTEXT("PinTooltip", "{DisplayName}{LineFeed1}{PinType}{LineFeed2}{Description}"), Args).ToString(); 
 }
 
 bool UFlowGraphSchema::CanShowDataTooltipForPin(const UEdGraphPin& Pin) const
@@ -1112,7 +1102,7 @@ void UFlowGraphSchema::GetGraphNodeContextActions(FGraphContextMenuBuilder& Cont
 	}
 }
 
-bool UFlowGraphSchema::IsAddOnAllowedForSelectedObjects(const TArray<UObject*>& SelectedObjects, const UFlowNodeAddOn* AddOnTemplate) const
+bool UFlowGraphSchema::IsAddOnAllowedForSelectedObjects(const TArray<UObject*>& SelectedObjects, const UFlowNodeAddOn* AddOnTemplate)
 {
 	FLOW_ASSERT_ENUM_MAX(EFlowAddOnAcceptResult, 3);
 
@@ -1248,7 +1238,7 @@ void UFlowGraphSchema::GatherNodes()
 	}
 
 	// prevent adding assets while compiling blueprints
-	//  (because adding assets can cause blueprint compiles to be queued as a side-effect (via GetPlaceableNodeOrAddOnBlueprint))
+	//  (because adding assets can cause blueprint compiles to be queued as a side effect (via GetPlaceableNodeOrAddOnBlueprint))
 	if (GCompilingBlueprint)
 	{
 		return;

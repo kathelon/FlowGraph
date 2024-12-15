@@ -70,28 +70,24 @@ void UFlowGraph::RefreshGraph()
 		const UFlowGraphSchema* FlowGraphSchema = CastChecked<UFlowGraphSchema>(GetSchema());
 		FlowGraphSchema->GatherNodes();
 
-		const TMap<FGuid, UFlowNode*>& FlowAssetNodesMap = GetFlowAsset()->GetNodes();
-		for (const TPair<FGuid, UFlowNode*>& Node : FlowAssetNodesMap)
+		for (const TPair<FGuid, UFlowNode*>& Node : GetFlowAsset()->GetNodes())
 		{
 			UFlowNode* FlowNode = Node.Value;
-			if (!IsValid(FlowNode))
+			if (IsValid(FlowNode))
 			{
-				continue;
+				UFlowGraphNode* const ExistingFlowGraphNode = Cast<UFlowGraphNode>(FlowNode->GetGraphNode());
+				UFlowGraphNode* RefreshedFlowGraphNode = ExistingFlowGraphNode;
+
+				const TSubclassOf<UEdGraphNode> ExpectGraphNodeClass = UFlowGraphSchema::GetAssignedGraphNodeClass(FlowNode->GetClass());
+				const UClass* ExistingFlowGraphNodeClass = IsValid(ExistingFlowGraphNode) ? ExistingFlowGraphNode->GetClass() : nullptr;
+				if (ExistingFlowGraphNodeClass != ExpectGraphNodeClass)
+				{
+					// Create a new Flow Graph Node of proper type
+					RefreshedFlowGraphNode = FFlowGraphSchemaAction_NewNode::RecreateNode(this, ExistingFlowGraphNode, FlowNode);
+				}
+
+				RecursivelyRefreshAddOns(*RefreshedFlowGraphNode);
 			}
-
-			UFlowGraphNode* const ExistingFlowGraphNode = Cast<UFlowGraphNode>(FlowNode->GetGraphNode());
-
-			UFlowGraphNode* RefreshedFlowGraphNode = ExistingFlowGraphNode;
-
-			const TSubclassOf<UEdGraphNode> ExpectGraphNodeClass = UFlowGraphSchema::GetAssignedGraphNodeClass(FlowNode->GetClass());
-			UClass* ExistingFlowGraphNodeClass = IsValid(ExistingFlowGraphNode) ? ExistingFlowGraphNode->GetClass() : nullptr;
-			if (ExistingFlowGraphNodeClass != ExpectGraphNodeClass)
-			{
-				// Create a new Flow Graph Node of proper type
-				RefreshedFlowGraphNode = FFlowGraphSchemaAction_NewNode::RecreateNode(this, ExistingFlowGraphNode, FlowNode);
-			}
-
-			RecursivelyRefreshAddOns(*RefreshedFlowGraphNode);
 		}
 
 		UnlockUpdates();
@@ -108,9 +104,10 @@ void UFlowGraph::RefreshGraph()
 
 void UFlowGraph::NotifyGraphChanged()
 {
-	UFlowAsset* FlowAsset = GetFlowAsset();
-
-	FlowAsset->HarvestNodeConnections();
+	if (UFlowAsset* FlowAsset = GetFlowAsset())
+	{
+		FlowAsset->HarvestNodeConnections();
+	}
 
 	Super::NotifyGraphChanged();
 }
