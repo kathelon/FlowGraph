@@ -1282,7 +1282,7 @@ void UFlowAsset::TriggerCustomOutput(const FName& EventName)
 		// it's a Root Flow, so the intention here might be to call event on the Flow Component
 		if (UFlowComponent* FlowComponent = Cast<UFlowComponent>(GetOwner()))
 		{
-			FlowComponent->OnTriggerRootFlowOutputEventDispatcher(this, EventName);
+			FlowComponent->DispatchRootFlowCustomEvent(this, EventName);
 		}
 	}
 }
