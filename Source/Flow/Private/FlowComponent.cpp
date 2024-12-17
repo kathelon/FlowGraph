@@ -435,6 +435,19 @@ void UFlowComponent::StartRootFlow()
 	}
 }
 
+void UFlowComponent::TriggerRootFlowCustomInput(const FName& EventName)
+{
+	if (!RootFlow || !IsFlowNetMode(RootFlowMode)) return;
+	
+	if (UFlowSubsystem* FlowSubsystem = GetFlowSubsystem())
+	{
+		if(auto Flow = FlowSubsystem->GetRootFlow(this); IsValid(Flow))
+		{
+			Flow->TriggerCustomInput(EventName);
+		}
+	}
+}
+
 void UFlowComponent::FinishRootFlow(UFlowAsset* TemplateAsset, const EFlowFinishPolicy FinishPolicy)
 {
 	if (UFlowSubsystem* FlowSubsystem = GetFlowSubsystem())

@@ -199,6 +199,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "RootFlow")
 	virtual void StartRootFlow();
 
+	// This will trigger a specific CustomInput on this components root flow
+	UFUNCTION(BlueprintCallable, Category = "RootFlow")
+	void TriggerRootFlowCustomInput(const FName& EventName);
+
 	// This will destroy instantiated Flow Asset - created from asset assigned on this component.
 	UFUNCTION(BlueprintCallable, Category = "RootFlow")
 	virtual void FinishRootFlow(UFlowAsset* TemplateAsset, const EFlowFinishPolicy FinishPolicy);
