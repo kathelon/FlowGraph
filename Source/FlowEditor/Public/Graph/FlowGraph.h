@@ -39,8 +39,7 @@ protected:
 	uint32 bIsLoadingGraph : 1;
 
 public:
-	static UEdGraph* CreateGraph(UFlowAsset* InFlowAsset);
-	static UEdGraph* CreateGraph(UFlowAsset* InFlowAsset, TSubclassOf<UFlowGraphSchema> FlowSchema);
+	static void CreateGraph(UFlowAsset* InFlowAsset);
 	void RefreshGraph();
 
 protected:
