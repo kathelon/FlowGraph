@@ -60,7 +60,7 @@ UFlowGraphNode* FFlowGraphSchemaAction_NewNode::CreateNode(UEdGraph* ParentGraph
 	const TSubclassOf<UFlowNodeBase> FlowNodeBaseClass = const_cast<UClass*>(NodeClass);
 	const TSubclassOf<UEdGraphNode> GraphNodeClass = UFlowGraphSchema::GetAssignedGraphNodeClass(FlowNodeBaseClass);
 	UFlowGraphNode* NewGraphNode = NewObject<UFlowGraphNode>(ParentGraph, GraphNodeClass, NAME_None, RF_Transactional);
-
+	
 	// register to the graph
 	NewGraphNode->CreateNewGuid();
 	ParentGraph->AddNode(NewGraphNode, false, bSelectNewNode);

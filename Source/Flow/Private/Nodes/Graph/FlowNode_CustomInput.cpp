@@ -18,6 +18,11 @@ void UFlowNode_CustomInput::ExecuteInput(const FName& PinName)
 	TriggerFirstOutput(true);
 }
 
+void UFlowNode_CustomInput::PostEditImport()
+{
+	EventName = NAME_None;
+}
+
 #if WITH_EDITOR
 FText UFlowNode_CustomInput::GetNodeTitle() const
 {
