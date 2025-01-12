@@ -1,6 +1,6 @@
 // Copyright https://github.com/MothCocoon/FlowGraph/graphs/contributors
 
-#include "Nodes/Route/FlowNode_Start.h"
+#include "Nodes/Graph/FlowNode_Start.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(FlowNode_Start)
 

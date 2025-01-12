@@ -1,6 +1,6 @@
 // Copyright https://github.com/MothCocoon/FlowGraph/graphs/contributors
 
-#include "Nodes/Utils/FlowNode_Checkpoint.h"
+#include "Nodes/Graph/FlowNode_Checkpoint.h"
 #include "FlowSubsystem.h"
 
 #include "Kismet/GameplayStatics.h"

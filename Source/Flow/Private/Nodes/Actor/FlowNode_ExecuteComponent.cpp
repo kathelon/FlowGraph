@@ -1,6 +1,6 @@
 // Copyright https://github.com/MothCocoon/FlowGraph/graphs/contributors
 
-#include "Nodes/World/FlowNode_ExecuteComponent.h"
+#include "Nodes/Actor/FlowNode_ExecuteComponent.h"
 #include "Interfaces/FlowCoreExecutableInterface.h"
 #include "Interfaces/FlowExternalExecutableInterface.h"
 #include "Interfaces/FlowContextPinSupplierInterface.h"
