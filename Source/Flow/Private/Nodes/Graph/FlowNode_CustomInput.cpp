@@ -20,6 +20,7 @@ void UFlowNode_CustomInput::ExecuteInput(const FName& PinName)
 
 void UFlowNode_CustomInput::PostEditImport()
 {
+	// Reset EventName after duplicating or copy/pasting
 	EventName = NAME_None;
 }
 
