@@ -9,7 +9,7 @@ UFlowNode_CustomEventBase::UFlowNode_CustomEventBase(const FObjectInitializer& O
 	: Super(ObjectInitializer)
 {
 #if WITH_EDITOR
-	Category = TEXT("Flow|Graph");
+	Category = TEXT("Graph");
 	NodeDisplayStyle = FlowNodeStyle::InOut;
 #endif
 

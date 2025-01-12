@@ -20,8 +20,8 @@ UFlowNode_ExecuteComponent::UFlowNode_ExecuteComponent()
 	: Super()
 {
 #if WITH_EDITOR
-	Category = TEXT("Flow|Owner");
-#endif // WITH_EDITOR
+	Category = TEXT("Actor");
+#endif
 }
 
 void UFlowNode_ExecuteComponent::InitializeInstance()

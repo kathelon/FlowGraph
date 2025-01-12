@@ -8,7 +8,7 @@ UFlowNode_LogicalAND::UFlowNode_LogicalAND(const FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 {
 #if WITH_EDITOR
-	Category = TEXT("Flow|Routing|Logic");
+	Category = TEXT("Route|Logic");
 	NodeDisplayStyle = FlowNodeStyle::Logic;
 #endif
 

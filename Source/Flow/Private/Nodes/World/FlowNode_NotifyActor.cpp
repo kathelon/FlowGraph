@@ -16,7 +16,7 @@ UFlowNode_NotifyActor::UFlowNode_NotifyActor(const FObjectInitializer& ObjectIni
 	, NetMode(EFlowNetMode::Authority)
 {
 #if WITH_EDITOR
-	Category = TEXT("Notifies");
+	Category = TEXT("Actor");
 #endif
 }
 

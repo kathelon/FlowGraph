@@ -10,7 +10,6 @@ UFlowNode_OnNotifyFromActor::UFlowNode_OnNotifyFromActor(const FObjectInitialize
 	, bRetroactive(false)
 {
 #if WITH_EDITOR
-	Category = TEXT("Notifies");
 	NodeDisplayStyle = FlowNodeStyle::Condition;
 #endif
 }

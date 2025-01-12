@@ -36,7 +36,7 @@ UFlowNode_PlayLevelSequence::UFlowNode_PlayLevelSequence(const FObjectInitialize
 	, TimeDilation(1.0f)
 {
 #if WITH_EDITOR
-	Category = TEXT("World");
+	Category = TEXT("Actor");
 	NodeDisplayStyle = FlowNodeStyle::Latent;
 #endif
 

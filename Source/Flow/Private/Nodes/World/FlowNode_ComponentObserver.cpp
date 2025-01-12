@@ -13,7 +13,7 @@ UFlowNode_ComponentObserver::UFlowNode_ComponentObserver(const FObjectInitialize
 {
 #if WITH_EDITOR
 	NodeDisplayStyle = FlowNodeStyle::Condition;
-	Category = TEXT("World");
+	Category = TEXT("Actor");
 #endif
 
 	InputPins = {FFlowPin(TEXT("Start")), FFlowPin(TEXT("Stop"))};

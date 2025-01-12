@@ -11,7 +11,7 @@ UFlowNode_Checkpoint::UFlowNode_Checkpoint(const FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 {
 #if WITH_EDITOR
-	Category = TEXT("Flow|Save");
+	Category = TEXT("Graph");
 #endif
 }
 
