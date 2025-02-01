@@ -956,11 +956,14 @@ void UFlowAsset::RemoveCustomOutput(const FName& EventName)
 
 UFlowNode_CustomInput* UFlowAsset::TryFindCustomInputNodeByEventName(const FName& EventName) const
 {
-	for (UFlowNode_CustomInput* InputNode : CustomInputNodes)
+	for (const TPair<FGuid, UFlowNode*>& Node : ObjectPtrDecay(Nodes))
 	{
-		if (IsValid(InputNode) && InputNode->GetEventName() == EventName)
+		if (UFlowNode_CustomInput* CustomInput = Cast<UFlowNode_CustomInput>(Node.Value))
 		{
-			return InputNode;
+			if (CustomInput->GetEventName() == EventName)
+			{
+				return CustomInput;
+			}
 		}
 	}
 

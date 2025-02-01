@@ -349,6 +349,7 @@ protected:
 	TMap<TWeakObjectPtr<UFlowNode_SubGraph>, TWeakObjectPtr<UFlowAsset>> ActiveSubGraphs;
 
 	// Optional entry points to the graph, similar to blueprint Custom Events
+	// Contains nodes only if it is initialized instance (see InitializeInstance, IsInstanceInitialized), empty otherwise
 	UPROPERTY()
 	TSet<TObjectPtr<UFlowNode_CustomInput>> CustomInputNodes;
 
