@@ -3,7 +3,7 @@
 #include "Graph/FlowGraphEditor.h"
 
 #include "Asset/FlowAssetEditor.h"
-#include "Asset/FlowDebuggerSubsystem.h"
+#include "Asset/FlowDebugEditorSubsystem.h"
 #include "FlowEditorCommands.h"
 #include "Graph/FlowGraphEditorSettings.h"
 #include "Graph/FlowGraphSchema_Actions.h"
@@ -258,7 +258,7 @@ FGraphAppearanceInfo SFlowGraphEditor::GetGraphAppearanceInfo() const
 	FGraphAppearanceInfo AppearanceInfo;
 	AppearanceInfo.CornerText = GetCornerText();
 
-	if (UFlowDebuggerSubsystem::IsPlaySessionPaused())
+	if (UFlowDebugEditorSubsystem::IsPlaySessionPaused())
 	{
 		AppearanceInfo.PIENotifyText = LOCTEXT("PausedLabel", "PAUSED");
 	}
