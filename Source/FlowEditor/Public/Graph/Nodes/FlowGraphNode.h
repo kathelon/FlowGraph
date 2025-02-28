@@ -48,7 +48,7 @@ public:
 	UPROPERTY()
 	TArray<TSubclassOf<UFlowNodeBase>> AssignedNodeClasses;
 	
-	void SetNodeTemplate(UFlowNodeBase* InFlowNodeBase);
+	void SetNodeTemplate(UFlowNodeBase* InNodeInstance);
 	const UFlowNodeBase* GetNodeTemplate() const;
 
 	UFlowNodeBase* GetFlowNodeBase() const;
@@ -115,9 +115,7 @@ public:
 	// --
 
 	void CreateAttachAddOnSubMenu(UToolMenu* Menu, UEdGraph* Graph) const;
-
 	bool CanAcceptSubNodeAsChild(const UFlowGraphNode& OtherSubNode, const TSet<const UEdGraphNode*>& AllRootSubNodesToPaste, FString* OutReasonString = nullptr) const;
-
 	bool IsAncestorNode(const UFlowGraphNode& OtherNode) const;
 
 protected:
@@ -165,10 +163,8 @@ protected:
 	bool CanReconstructNode() const;
 	
 	bool TryUpdateNodePins() const;
-	
 	bool TryUpdateAutoDataPins() const;
-
-	bool CheckGraphPinsMatchNodePins();
+	bool CheckGraphPinsMatchNodePins() const;
 	
 //////////////////////////////////////////////////////////////////////////
 // Pins
@@ -259,11 +255,7 @@ public:
 	void OnUpdateAsset(int32 UpdateFlags) { RebuildRuntimeAddOnsFromEditorSubNodes(); }
 	void RebuildRuntimeAddOnsFromEditorSubNodes();
 
-	static void DiffSubNodes(
-		const FText& NodeTypeDisplayName,
-		const TArray<UFlowGraphNode*>& LhsSubNodes,
-		const TArray<UFlowGraphNode*>& RhsSubNodes,
-		FDiffResults& Results);
+	static void DiffSubNodes(const FText& NodeTypeDisplayName, const TArray<UFlowGraphNode*>& LhsSubNodes,	const TArray<UFlowGraphNode*>& RhsSubNodes,	FDiffResults& Results);
 
 	//~ Begin UObject Interface
 #if WITH_EDITOR
@@ -271,11 +263,9 @@ public:
 #endif
 	// End UObject
 
-	// @return the input pin for this state
 	virtual UEdGraphPin* GetInputPin(int32 InputIndex = 0) const;
-	// @return the output pin for this state
 	virtual UEdGraphPin* GetOutputPin(int32 InputIndex = 0) const;
-	virtual UEdGraph* GetBoundGraph() const { return NULL; }
+	virtual UEdGraph* GetBoundGraph() const { return nullptr; }
 
 	virtual FText GetDescription() const;
 
@@ -286,7 +276,7 @@ public:
 	virtual void OnSubNodeAdded(UFlowGraphNode* SubNode);
 
 	virtual int32 FindSubNodeDropIndex(UFlowGraphNode* SubNode) const;
-	virtual void InsertSubNodeAt(UFlowGraphNode* SubNode, int32 DropIndex);
+	virtual void InsertSubNodeAt(UFlowGraphNode* SubNode, const int32 DropIndex);
 
 	/** check if node is subnode */
 	virtual bool IsSubNode() const;
@@ -304,13 +294,11 @@ public:
 	bool UsesBlueprint() const;
 
 protected:
-
 	virtual void ResetNodeOwner();
 
 	void LogError(const FString& MessageToLog, const UFlowNodeBase* FlowNodeBase) const;
 
 public:
-	
 	/** instance class */
 	UPROPERTY()
 	TSoftClassPtr<UFlowNodeBase> NodeInstanceClass;

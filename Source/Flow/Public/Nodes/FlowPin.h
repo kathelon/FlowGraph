@@ -206,7 +206,7 @@ public:
 	static bool ValidateEnum(const UEnum& EnumType);
 #endif // WITH_EDITOR
 
-	void SetPinType(EFlowPinType InFlowPinType, UObject* SubCategoryObject = nullptr);
+	void SetPinType(const EFlowPinType InFlowPinType, UObject* SubCategoryObject = nullptr);
 	EFlowPinType GetPinType() const { return PinType; }
 	static const FName& GetPinCategoryFromPinType(EFlowPinType FlowPinType);
 	static const TArray<FName>& GetFlowPinTypeEnumValuesWithoutSpaces();
