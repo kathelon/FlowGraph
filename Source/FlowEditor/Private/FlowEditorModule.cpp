@@ -15,6 +15,8 @@
 #include "Pins/SFlowInputPinHandle.h"
 #include "Pins/SFlowOutputPinHandle.h"
 
+#include "FlowModule.h"
+
 #include "DetailCustomizations/FlowAssetDetails.h"
 #include "DetailCustomizations/FlowNode_Details.h"
 #include "DetailCustomizations/FlowNode_ComponentObserverDetails.h"
@@ -41,7 +43,6 @@
 
 #include "AssetToolsModule.h"
 #include "EdGraphUtilities.h"
-#include "FlowModule.h"
 #include "IAssetSearchModule.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "ISequencerChannelInterface.h" // ignore Rider's false "unused include" warning

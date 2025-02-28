@@ -2,6 +2,8 @@
 
 #include "FlowDebuggerModule.h"
 
+#include "Modules/ModuleManager.h"
+
 #define LOCTEXT_NAMESPACE "FlowDebuggerModule"
 
 void FFlowDebuggerModule::StartupModule()

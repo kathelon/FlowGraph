@@ -3,11 +3,10 @@
 #include "Debugger/FlowDebuggerSubsystem.h"
 #include "Debugger/FlowDebuggerSettings.h"
 
-#include "Editor/UnrealEdEngine.h"
+#include "EdGraph/EdGraphNode.h"
+#include "EdGraph/EdGraphPin.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(FlowDebuggerSubsystem)
-
-#define LOCTEXT_NAMESPACE "FlowDebuggerSubsystem"
 
 UFlowDebuggerSubsystem::UFlowDebuggerSubsystem()
 {
@@ -248,5 +247,3 @@ void UFlowDebuggerSubsystem::SaveSettings()
 	UFlowDebuggerSettings* Settings = GetMutableDefault<UFlowDebuggerSettings>();
 	Settings->SaveConfig();
 }
-
-#undef LOCTEXT_NAMESPACE
