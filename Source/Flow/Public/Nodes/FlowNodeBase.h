@@ -7,10 +7,9 @@
 #include "Interfaces/FlowCoreExecutableInterface.h"
 #include "Interfaces/FlowContextPinSupplierInterface.h"
 #include "FlowMessageLog.h"
-#include "FlowTags.h"
+#include "FlowTags.h" // used by subclasses
 #include "FlowTypes.h"
 #include "Types/FlowDataPinResults.h"
-#include "NativeGameplayTags.h"
 
 #include "FlowNodeBase.generated.h"
 
@@ -23,7 +22,7 @@ class IFlowOwnerInterface;
 class IFlowDataPinValueSupplierInterface;
 struct FFlowPin;
 
-#if WITH_EDITOR
+#if WITH_EDITORONLY_DATA
 DECLARE_DELEGATE(FFlowNodeEvent);
 #endif
 

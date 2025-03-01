@@ -204,7 +204,7 @@ const FFlowPin* UFlowNodeBase::FindFlowPinByName(const FName& PinName, const TAr
 
 FFlowPin* UFlowNodeBase::FindFlowPinByName(const FName& PinName, TArray<FFlowPin>& FlowPins)
 {
-	return FlowPins.FindByPredicate([&PinName](FFlowPin& FlowPin)
+	return FlowPins.FindByPredicate([&PinName](const FFlowPin& FlowPin)
 	{
 		return FlowPin.PinName == PinName;
 	});
@@ -886,7 +886,7 @@ void UFlowNodeBase::LogVerbose(FString Message) const
 #if !UE_BUILD_SHIPPING
 bool UFlowNodeBase::BuildMessage(FString& Message) const
 {
-	UFlowAsset* FlowAsset = GetFlowAsset();
+	const UFlowAsset* FlowAsset = GetFlowAsset();
 	if (FlowAsset && FlowAsset->GetTemplateAsset()) // this is runtime log which is should be only called on runtime instances of asset
 	{
 		const FString TemplatePath = FlowAsset->GetTemplateAsset()->GetPathName();
