@@ -11,15 +11,6 @@ class SFlowGraphEditor;
 class UFlowGraphNode;
 class UFlowGraphSchema;
 
-class FLOWEDITOR_API FFlowGraphInterface : public IFlowGraphInterface
-{
-public:
-	virtual ~FFlowGraphInterface() override {}
-
-	virtual void OnInputTriggered(UEdGraphNode* GraphNode, const int32 Index) const override;
-	virtual void OnOutputTriggered(UEdGraphNode* GraphNode, const int32 Index) const override;
-};
-
 UCLASS()
 class FLOWEDITOR_API UFlowGraph : public UEdGraph
 {

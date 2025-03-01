@@ -30,8 +30,8 @@ using namespace EFlowForEachAddOnFunctionReturnValue_Classifiers;
 
 UFlowNodeBase::UFlowNodeBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, GraphNode(nullptr)
 #if WITH_EDITORONLY_DATA
+	, GraphNode(nullptr)
 	, bDisplayNodeTitleWithoutPrefix(true)
 	, bCanDelete(true)
 	, bCanDuplicate(true)
@@ -575,16 +575,13 @@ EFlowForEachAddOnFunctionReturnValue UFlowNodeBase::ForEachAddOnForClass(const U
 	return ReturnValue;
 }
 
+#if WITH_EDITOR
 void UFlowNodeBase::PostLoad()
 {
 	Super::PostLoad();
 
-#if WITH_EDITOR
 	EnsureNodeDisplayStyle();
-#endif
 }
-
-#if WITH_EDITOR
 
 void UFlowNodeBase::SetGraphNode(UEdGraphNode* NewGraphNode)
 {
@@ -726,7 +723,7 @@ FText UFlowNodeBase::GetGeneratedDisplayName() const
 
 void UFlowNodeBase::EnsureNodeDisplayStyle()
 {
-	// todo: remove in Flow 2.1
+	// todo: remove in Flow 2.2
 
 	// Backward compatibility update to convert NodeStyle to NodeDisplayStyle
 	FLOW_ASSERT_ENUM_MAX(EFlowNodeStyle, 7);

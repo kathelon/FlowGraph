@@ -17,7 +17,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(FlowSubsystem)
 
-#if WITH_EDITOR
+#if !UE_BUILD_SHIPPING
 FNativeFlowAssetEvent UFlowSubsystem::OnInstancedTemplateAdded;
 FNativeFlowAssetEvent UFlowSubsystem::OnInstancedTemplateRemoved;
 #endif

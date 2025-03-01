@@ -4,53 +4,70 @@
 
 #include "FlowDebuggerTypes.generated.h"
 
-// It can represent any trait added on the specific node instance, i.e. breakpoint
 USTRUCT()
 struct FLOWDEBUGGER_API FFlowBreakpoint
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 protected:
-	/** Pin that the trait is placed on. Zero filled if this trait is for a node, not a pin */
+	// Applies only to node breakpoint
+	// Pin breakpoints are deactivated by removing element from FNodeBreakpoint::PinBreakpoints
 	UPROPERTY()
-	FGuid PinId;
+	bool bActive;
 
 	UPROPERTY()
 	uint8 bEnabled : 1;
-	
+
+	UPROPERTY(Transient)
 	uint8 bHit : 1;
 
 public:
 	FFlowBreakpoint()
-		: bEnabled(false)
+		: bActive(false)
+		, bEnabled(false)
 		, bHit(false)
 	{
 	};
 
-	explicit FFlowBreakpoint(const bool bInitialState)
-		: bEnabled(bInitialState)
-		, bHit(false)
+	void SetActive(const bool bNowActive)
 	{
-	};
+		bActive = bNowActive;
+		bEnabled = bNowActive;
+	}
 
-	explicit FFlowBreakpoint(const FGuid& InPinId, const bool bInitialState)
-		: PinId(InPinId)
-		, bEnabled(bInitialState)
-		, bHit(false)
+	void SetEnabled(const bool bNowEnabled)
 	{
-	};
+		bEnabled = bNowEnabled;
+	}
 
-	void SetEnabled(const bool bNowEnabled) { bEnabled = bNowEnabled; }
-	void MarkAsHit(const bool bNowHit) { bHit = bNowHit; }
+	void MarkAsHit(const bool bNowHit)
+	{
+		bHit = bNowHit;
+	}
 
-	FGuid GetPinId() const { return PinId; }
-	bool MatchesGuid(const FGuid& OtherGuid) const { return PinId == OtherGuid; }
-	
+	bool IsActive() const { return bActive; }
 	bool IsEnabled() const { return bEnabled; }
 	bool IsHit() const { return bHit; }
+};
 
-	bool operator==(const FFlowBreakpoint& Other) const
+USTRUCT()
+struct FLOWDEBUGGER_API FNodeBreakpoint
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	FFlowBreakpoint Breakpoint;
+
+	UPROPERTY()
+	TMap<FName, FFlowBreakpoint> PinBreakpoints;
+
+	FNodeBreakpoint()
 	{
-		return PinId == Other.PinId;
+	};
+
+	bool IsEmpty() const
+	{
+		return !Breakpoint.IsActive() && PinBreakpoints.IsEmpty();
 	}
 };

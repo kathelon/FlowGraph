@@ -19,8 +19,5 @@ public:
 	UFlowDebuggerSettings();
 
 	UPROPERTY(config)
-	TMap<FGuid, FFlowBreakpoint> NodeBreakpoints;
-
-	UPROPERTY(config)
-	TMap<FGuid, FFlowBreakpoint> PinBreakpoints;
+	TMap<FGuid, FNodeBreakpoint> NodeBreakpoints;
 };

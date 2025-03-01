@@ -8,7 +8,7 @@
 #include "FlowDebuggerSubsystem.generated.h"
 
 class UEdGraphNode;
-class UEdGraphPin;
+class UFlowAsset;
 
 /**
  * Persistent subsystem supporting Flow Graph debugging.
@@ -24,41 +24,52 @@ public:
 
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
-	virtual void PausePlaySession() {}
-	virtual bool IsPlaySessionPaused() { return false; }
+protected:
+	virtual void OnInstancedTemplateAdded(UFlowAsset* AssetTemplate);
+	virtual void OnInstancedTemplateRemoved(UFlowAsset* AssetTemplate) const;
 
-	virtual void AddBreakpoint(const UEdGraphNode* Node);
-	virtual void AddBreakpoint(const UEdGraphPin* Pin);
+	virtual void OnPinTriggered(const FGuid& NodeGuid, const FName& PinName);
 
-	virtual void RemoveAllBreakpoints(const UEdGraphNode* Node);
-	virtual void RemoveNodeBreakpoint(const UEdGraphNode* Node);
-	virtual void RemovePinBreakpoint(const UEdGraphPin* Pin);
+public:
+	virtual void AddBreakpoint(const FGuid& NodeGuid);
+	virtual void AddBreakpoint(const FGuid& NodeGuid, const FName& PinName);
 
+	virtual void RemoveAllBreakpoints(const FGuid& NodeGuid);
+	virtual void RemoveNodeBreakpoint(const FGuid& NodeGuid);
+	virtual void RemovePinBreakpoint(const FGuid& NodeGuid, const FName& PinName);
+
+#if WITH_EDITOR
 	/** Removes obsolete pin breakpoints for provided. Pin list can be changed during node reconstruction. */
 	virtual void RemoveObsoletePinBreakpoints(const UEdGraphNode* Node);
+#endif
 
-	virtual void ToggleBreakpoint(const UEdGraphNode* Node);
-	virtual void ToggleBreakpoint(const UEdGraphPin* Pin);
-	
-	virtual FFlowBreakpoint* FindBreakpoint(const UEdGraphNode* Node);
-	virtual FFlowBreakpoint* FindBreakpoint(const UEdGraphPin* Pin);
+	virtual void ToggleBreakpoint(const FGuid& NodeGuid);
+	virtual void ToggleBreakpoint(const FGuid& NodeGuid, const FName& PinName);
 
-	virtual void SetBreakpointEnabled(const UEdGraphNode* Node, bool bEnabled);
-	virtual void SetBreakpointEnabled(const UEdGraphPin* Pin, bool bEnabled);
+	virtual FFlowBreakpoint* FindBreakpoint(const FGuid& NodeGuid);
+	virtual FFlowBreakpoint* FindBreakpoint(const FGuid& NodeGuid, const FName& PinName);
 
-	virtual bool IsBreakpointEnabled(const UEdGraphNode* Node);
-	virtual bool IsBreakpointEnabled(const UEdGraphPin* Pin);
+	virtual void SetBreakpointEnabled(const FGuid& NodeGuid, bool bEnabled);
+	virtual void SetBreakpointEnabled(const FGuid& NodeGuid, const FName& PinName, bool bEnabled);
 
-	virtual bool MarkAsHit(const UEdGraphNode* Node);
-	virtual bool MarkAsHit(const UEdGraphPin* Pin);
-
-	virtual void ResetHit(const UEdGraphNode* Node);
-	virtual void ResetHit(const UEdGraphPin* Pin);
-
-	virtual bool IsBreakpointHit(const UEdGraphNode* Node);
-	virtual bool IsBreakpointHit(const UEdGraphPin* Pin);
+	virtual bool IsBreakpointEnabled(const FGuid& NodeGuid);
+	virtual bool IsBreakpointEnabled(const FGuid& NodeGuid, const FName& PinName);
 
 protected:
+	virtual void MarkAsHit(const FGuid& NodeGuid);
+	virtual void MarkAsHit(const FGuid& NodeGuid, const FName& PinName);
+	
+	virtual void PauseSession();
+	virtual void ResumeSession();
+	void SetPause(const bool bPause);
+
+	virtual void ClearHitBreakpoints();
+
+public:
+	virtual bool IsBreakpointHit(const FGuid& NodeGuid);
+	virtual bool IsBreakpointHit(const FGuid& NodeGuid, const FName& PinName);
+
+private:
 	/** Saves any modifications made to breakpoints */
 	virtual void SaveSettings();
 };

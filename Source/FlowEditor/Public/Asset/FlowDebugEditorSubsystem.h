@@ -24,15 +24,14 @@ public:
 protected:
 	TMap<TWeakObjectPtr<UFlowAsset>, TSharedPtr<class IMessageLogListing>> RuntimeLogs;
 
-	void OnInstancedTemplateAdded(UFlowAsset* FlowAsset);
-	void OnInstancedTemplateRemoved(UFlowAsset* FlowAsset) const;
+	virtual void OnInstancedTemplateAdded(UFlowAsset* AssetTemplate) override;
+	virtual void OnInstancedTemplateRemoved(UFlowAsset* AssetTemplate) const override;
 
-	void OnRuntimeMessageAdded(const UFlowAsset* FlowAsset, const TSharedRef<FTokenizedMessage>& Message) const;
+	void OnRuntimeMessageAdded(const UFlowAsset* AssetTemplate, const TSharedRef<FTokenizedMessage>& Message) const;
 
-	void OnBeginPIE(const bool bIsSimulating);
-	void OnEndPIE(const bool bIsSimulating);
+	virtual void OnBeginPIE(const bool bIsSimulating);
+	virtual void OnResumePIE(const bool bIsSimulating);
+	virtual void OnEndPIE(const bool bIsSimulating);
 
-public:
-	virtual void PausePlaySession() override;
-	virtual bool IsPlaySessionPaused() override;
+	virtual void PauseSession() override;
 };
