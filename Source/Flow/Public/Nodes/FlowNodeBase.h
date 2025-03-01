@@ -272,7 +272,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UEdGraphNode> GraphNode;
-	
+
 #if WITH_EDITORONLY_DATA
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "FlowNode")
