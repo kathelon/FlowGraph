@@ -128,7 +128,7 @@ void UFlowGraphNode::PostPlacedNewNode()
 
 	SubscribeToExternalChanges();
 
-	// NOTE - NodeInstance can be already spawned by paste operation, don't override it
+	// note: NodeInstance can be already spawned by paste operation, don't override it
 	if (NodeInstanceClass.IsPending())
 	{
 		NodeInstanceClass.LoadSynchronous();
