@@ -811,9 +811,9 @@ void UFlowNodeBase::LogError(FString Message, const EFlowOnScreenMessageType OnS
 			{
 				if (UViewportStatsSubsystem* StatsSubsystem = World->GetSubsystem<UViewportStatsSubsystem>())
 				{
-					StatsSubsystem->AddDisplayDelegate([WeakThis = TWeakObjectPtr(this), Message](FText& OutText, FLinearColor& OutColor)
+					StatsSubsystem->AddDisplayDelegate([WeakThis = TWeakObjectPtr<const UFlowNodeBase>(this), Message](FText& OutText, FLinearColor& OutColor)
 					{
-            					const UFlowNodeBase* ThisPtr = WeakThis.Get();
+						const UFlowNodeBase* ThisPtr = WeakThis.Get();
 						if (ThisPtr && ThisPtr->GetFlowNodeSelfOrOwner()->GetActivationState() != EFlowNodeState::NeverActivated)
 						{
 							OutText = FText::FromString(Message);

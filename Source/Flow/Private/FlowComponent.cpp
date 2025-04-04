@@ -227,43 +227,43 @@ void UFlowComponent::RemoveIdentityTags(FGameplayTagContainer Tags, const EFlowN
 
 void UFlowComponent::OnRep_IdentityTags(const FGameplayTagContainer& PreviousTags)
 {
-	FGameplayTagContainer addedTags;
 
-	//Any tags that are now in the IdentityTags container but haven't been previously must have been added.
-	for (const FGameplayTag& tag : IdentityTags)
+	// Any tags that are now in the IdentityTags container but haven't been previously must have been added.
+	FGameplayTagContainer AddedTags;
+	for (const FGameplayTag& Tag : IdentityTags)
 	{
-		if (!PreviousTags.HasTagExact(tag))
+		if (!PreviousTags.HasTagExact(Tag))
 		{
-			addedTags.AddTag(tag);
+			AddedTags.AddTag(Tag);
 		}
 	}
 
-	if (addedTags.Num() > 0)
+	if (AddedTags.Num() > 0)
 	{
-		OnIdentityTagsAdded.Broadcast(this, addedTags);
+		OnIdentityTagsAdded.Broadcast(this, AddedTags);
 
 		if (UFlowSubsystem* FlowSubsystem = GetFlowSubsystem())
 		{
-			FlowSubsystem->OnIdentityTagsAdded(this, addedTags);
+			FlowSubsystem->OnIdentityTagsAdded(this, AddedTags);
 		}
 	}
-	
-	FGameplayTagContainer removedTags;
-	//Any tags that have been in the IdentityTags container previously but aren't in it anymore after the replication update must have been removed.
-	for (const FGameplayTag& tag : PreviousTags)
+
+	// Any tags that have been in the IdentityTags container previously but aren't in it anymore after the replication update must have been removed.
+	FGameplayTagContainer RemovedTags;
+	for (const FGameplayTag& Tag : PreviousTags)
 	{
-		if (!IdentityTags.HasTagExact(tag))
+		if (!IdentityTags.HasTagExact(Tag))
 		{
-			removedTags.AddTag(tag);
+			RemovedTags.AddTag(Tag);
 		}
 	}
-	if (removedTags.Num() > 0)
+	if (RemovedTags.Num() > 0)
 	{
-		OnIdentityTagsRemoved.Broadcast(this, removedTags);
+		OnIdentityTagsRemoved.Broadcast(this, RemovedTags);
 
 		if (UFlowSubsystem* FlowSubsystem = GetFlowSubsystem())
 		{
-			FlowSubsystem->OnIdentityTagsRemoved(this, removedTags);
+			FlowSubsystem->OnIdentityTagsRemoved(this, RemovedTags);
 		}
 	}
 }
@@ -288,9 +288,9 @@ void UFlowComponent::LogError(FString Message, const EFlowOnScreenMessageType On
 		{
 			if (UViewportStatsSubsystem* StatsSubsystem = World->GetSubsystem<UViewportStatsSubsystem>())
 			{
-				StatsSubsystem->AddDisplayDelegate([WeakThis = TWeakObjectPtr(this), Message](FText& OutText, FLinearColor& OutColor)
+				StatsSubsystem->AddDisplayDelegate([WeakThis = TWeakObjectPtr<const UFlowComponent>(this), Message](FText& OutText, FLinearColor& OutColor)
 				{
-					if (WeakThis.Valid())
+					if (WeakThis.Get())
 					{
 						OutText = FText::FromString(Message);
 						OutColor = FLinearColor::Red;
