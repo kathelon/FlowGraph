@@ -284,15 +284,20 @@ void UFlowComponent::LogError(FString Message, const EFlowOnScreenMessageType On
 
 	if (OnScreenMessageType == EFlowOnScreenMessageType::Permanent)
 	{
-		if (GetWorld())
+		if (UWorld* World = GetWorld())
 		{
-			if (UViewportStatsSubsystem* StatsSubsystem = GetWorld()->GetSubsystem<UViewportStatsSubsystem>())
+			if (UViewportStatsSubsystem* StatsSubsystem = World->GetSubsystem<UViewportStatsSubsystem>())
 			{
 				StatsSubsystem->AddDisplayDelegate([WeakThis = TWeakObjectPtr(this), Message](FText& OutText, FLinearColor& OutColor)
 				{
-					OutText = FText::FromString(Message);
-					OutColor = FLinearColor::Red;
-					return WeakThis.IsValid();
+					if (WeakThis.Valid())
+					{
+						OutText = FText::FromString(Message);
+						OutColor = FLinearColor::Red;
+						return true;
+					}
+
+					return false;
 				});
 			}
 		}

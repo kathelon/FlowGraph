@@ -807,16 +807,21 @@ void UFlowNodeBase::LogError(FString Message, const EFlowOnScreenMessageType OnS
 		// OnScreen Message
 		if (OnScreenMessageType == EFlowOnScreenMessageType::Permanent)
 		{
-			if (GetWorld())
+			if (UWorld* World = GetWorld())
 			{
-				if (UViewportStatsSubsystem* StatsSubsystem = GetWorld()->GetSubsystem<UViewportStatsSubsystem>())
+				if (UViewportStatsSubsystem* StatsSubsystem = World->GetSubsystem<UViewportStatsSubsystem>())
 				{
 					StatsSubsystem->AddDisplayDelegate([WeakThis = TWeakObjectPtr(this), Message](FText& OutText, FLinearColor& OutColor)
 					{
-						OutText = FText::FromString(Message);
-						OutColor = FLinearColor::Red;
+            					const UFlowNodeBase* ThisPtr = WeakThis.Get();
+						if (ThisPtr && ThisPtr->GetFlowNodeSelfOrOwner()->GetActivationState() != EFlowNodeState::NeverActivated)
+						{
+							OutText = FText::FromString(Message);
+							OutColor = FLinearColor::Red;
+							return true;
+						}
 
-						return WeakThis.IsValid() && WeakThis->GetFlowNodeSelfOrOwner()->GetActivationState() != EFlowNodeState::NeverActivated;
+						return false;
 					});
 				}
 			}
