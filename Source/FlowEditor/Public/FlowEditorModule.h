@@ -8,6 +8,7 @@
 #include "PropertyEditorDelegates.h"
 #include "Toolkits/AssetEditorToolkit.h"
 #include "Toolkits/IToolkit.h"
+#include "Toolkits/AssetEditorToolkit.h"
 
 class FSlateStyleSet;
 class FToolBarBuilder;
