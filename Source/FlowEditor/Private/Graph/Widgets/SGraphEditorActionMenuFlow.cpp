@@ -14,6 +14,7 @@
 #include "Templates/Casts.h"
 #include "Types/SlateStructs.h"
 #include "Widgets/Layout/SBox.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 SGraphEditorActionMenuFlow::~SGraphEditorActionMenuFlow()
 {

@@ -5,6 +5,8 @@
 #include "EdGraph/EdGraphSchema.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "Templates/SubclassOf.h"
+#include "Runtime/Launch/Resources/Version.h"
+
 #include "FlowGraphSchema.generated.h"
 
 class UFlowAsset;
