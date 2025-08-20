@@ -65,7 +65,7 @@ public:
 
 	// UFlowNodeAddOn
 
-	//// The FlowNode that contains this AddOn
+	// The FlowNode that contains this AddOn
 	// (accessible only when initialized, runtime only)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "FlowNodeAddon", DisplayName = "Get Flow Node")
 	FLOW_API UFlowNode* GetFlowNode() const;
