@@ -272,15 +272,9 @@ bool UFlowAsset::CanFlowAssetReferenceFlowNode(const UClass& FlowNodeClass, FTex
 		return false;
 	}
 
-	FAssetReferenceFilterContext AssetReferenceFilterContext;
-
-#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 5
-	AssetReferenceFilterContext.ReferencingAssets.Add(FAssetData(this));
-#else
-	AssetReferenceFilterContext.AddReferencingAsset(FAssetData(this));
-#endif
-
 	// Confirm plugin reference restrictions are being respected
+	FAssetReferenceFilterContext AssetReferenceFilterContext;
+	AssetReferenceFilterContext.AddReferencingAsset(FAssetData(this));
 	const TSharedPtr<IAssetReferenceFilter> FlowAssetReferenceFilter = GEditor->MakeAssetReferenceFilter(AssetReferenceFilterContext);
 	if (FlowAssetReferenceFilter.IsValid())
 	{
