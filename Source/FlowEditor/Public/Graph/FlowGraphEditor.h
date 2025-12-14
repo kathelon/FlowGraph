@@ -157,4 +157,7 @@ private:
 
 	void JumpToNodeDefinition() const;
 	bool CanJumpToNodeDefinition() const;
+
+	void RunFromNode() const;
+	bool CanRunFromNode() const;
 };

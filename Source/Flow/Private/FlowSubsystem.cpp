@@ -76,7 +76,7 @@ void UFlowSubsystem::AbortActiveFlows()
 	RootInstances.Empty();
 }
 
-void UFlowSubsystem::StartRootFlow(UObject* Owner, UFlowAsset* FlowAsset, const bool bAllowMultipleInstances /* = true */)
+void UFlowSubsystem::StartRootFlow(UObject* Owner, UFlowAsset* FlowAsset, const bool bAllowMultipleInstances /* = true */, const FGuid& StartingNodeGuid /* = FGuid() */)
 {
 	if (FlowAsset)
 	{
@@ -84,7 +84,7 @@ void UFlowSubsystem::StartRootFlow(UObject* Owner, UFlowAsset* FlowAsset, const 
 		{
 			// todo: (gtaylor) In the future, we may want to provide a way to set a data pin value supplier
 			// for the root flow graph.
-			NewFlow->StartFlow();
+			NewFlow->StartFlow(nullptr, StartingNodeGuid);
 		}
 	}
 #if WITH_EDITOR

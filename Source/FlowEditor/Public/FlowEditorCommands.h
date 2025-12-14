@@ -53,6 +53,7 @@ public:
 	/** Jumps */
 	TSharedPtr<FUICommandInfo> FocusViewport;
 	TSharedPtr<FUICommandInfo> JumpToNodeDefinition;
+	TSharedPtr<FUICommandInfo> RunFromNode;
 
 	virtual void RegisterCommands() override;
 };

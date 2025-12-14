@@ -10,6 +10,7 @@
 
 #include "FlowEditorCommands.h"
 #include "Graph/FlowGraph.h"
+#include "Graph/FlowGraphEditor.h"
 #include "Graph/FlowGraphEditorSettings.h"
 #include "Graph/FlowGraphSchema.h"
 #include "Graph/FlowGraphSettings.h"
@@ -569,6 +570,10 @@ void UFlowGraphNode::GetNodeContextMenuActions(class UToolMenu* Menu, class UGra
 			if (CanJumpToDefinition())
 			{
 				Section.AddMenuEntry(FlowGraphCommands.JumpToNodeDefinition);
+			}
+			if (SFlowGraphEditor::IsPIE())
+			{
+				Section.AddMenuEntry(FlowGraphCommands.RunFromNode);
 			}
 		}
 

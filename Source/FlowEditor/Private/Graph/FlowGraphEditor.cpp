@@ -4,8 +4,12 @@
 
 #include "Asset/FlowAssetEditor.h"
 #include "FlowEditorCommands.h"
+#include "FlowSubsystem.h"
+#include "Graph/FlowGraphSchema.h"
 #include "Graph/FlowGraphSchema_Actions.h"
 #include "Graph/Nodes/FlowGraphNode.h"
+
+#include "Engine/GameInstance.h"
 
 #include "Debugger/FlowDebuggerSubsystem.h"
 
@@ -236,6 +240,10 @@ void SFlowGraphEditor::BindGraphCommands()
 	CommandList->MapAction(FlowGraphCommands.JumpToNodeDefinition,
 	                               FExecuteAction::CreateSP(this, &SFlowGraphEditor::JumpToNodeDefinition),
 	                               FCanExecuteAction::CreateSP(this, &SFlowGraphEditor::CanJumpToNodeDefinition));
+
+	CommandList->MapAction(FlowGraphCommands.RunFromNode,
+								   FExecuteAction::CreateSP(this, &SFlowGraphEditor::RunFromNode),
+								   FCanExecuteAction::CreateSP(this, &SFlowGraphEditor::CanRunFromNode));
 
 	// Organisation Commands
 	CommandList->MapAction(GraphEditorCommands.AlignNodesTop,
@@ -1451,7 +1459,34 @@ void SFlowGraphEditor::JumpToNodeDefinition() const
 
 bool SFlowGraphEditor::CanJumpToNodeDefinition() const
 {
-	return GetSelectedFlowNodes().Num() == 1;
+	return GetSelectedFlowNodes().Num() == 1 && GetSelectedFlowNodes().Array()[0]->CanJumpToDefinition();
+}
+
+void SFlowGraphEditor::RunFromNode() const
+{
+	if (IsPIE())
+	{
+		const TSet<UFlowGraphNode*> SelectedNodes = GetSelectedFlowNodes();
+		if (SelectedNodes.Num() == 1)
+		{
+			if (const UFlowGraphNode* SelectedNode = SelectedNodes.Array()[0])
+			{
+				if (const UFlowNode* HelperNode = Cast<UFlowNode>(SelectedNode->GetFlowNodeBase()))
+				{
+					if (UFlowSubsystem* FlowSubsystem = GEditor->PlayWorld->GetGameInstance()->GetSubsystem<UFlowSubsystem>())
+					{
+						FlowSubsystem->AbortActiveFlows();
+						FlowSubsystem->StartRootFlow(GEditor->PlayWorld->GetGameInstance(), const_cast<UFlowAsset*>(FlowAsset.Get()), true, HelperNode->GetGuid());
+					}
+				}
+			}
+		}
+	}
+}
+
+bool SFlowGraphEditor::CanRunFromNode() const
+{
+	return IsPIE() && GetSelectedFlowNodes().Num() == 1;
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -1193,11 +1193,27 @@ void UFlowAsset::PreStartFlow()
 #endif
 }
 
-void UFlowAsset::StartFlow(IFlowDataPinValueSupplierInterface* DataPinValueSupplier)
+void UFlowAsset::StartFlow(IFlowDataPinValueSupplierInterface* DataPinValueSupplier /*= nullptr*/, const FGuid& StartingNodeGuid /*= FGuid()*/)
 {
 	PreStartFlow();
 
-	if (UFlowNode* ConnectedEntryNode = GetDefaultEntryNode())
+	if (StartingNodeGuid.IsValid())
+	{
+		if (UFlowNode* StartingNode = Nodes.FindRef(StartingNodeGuid))
+		{
+			RecordedNodes.Add(StartingNode);
+
+			if (StartingNode->GetInputPins().Num() > 0)
+			{
+				StartingNode->TriggerInput(StartingNode->GetInputPins()[0].PinName);
+			}
+			else
+			{
+				StartingNode->TriggerFirstOutput(true);
+			}
+		}
+	}
+	else if (UFlowNode* ConnectedEntryNode = GetDefaultEntryNode())
 	{
 		RecordedNodes.Add(ConnectedEntryNode);
 
