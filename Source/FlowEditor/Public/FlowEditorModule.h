@@ -59,8 +59,12 @@ private:
 public:
 	FDelegateHandle FlowTrackCreateEditorHandle;
 	FDelegateHandle ModulesChangedHandle;
+	FDelegateHandle PostEngineInitHandle;
 
 private:
+	void HandlePostEngineInit();
+	void TryOpenWelcomeWindow();
+
 	void ModulesChangesCallback(FName ModuleName, EModuleChangeReason ReasonForChange) const;
 	void RegisterAssetIndexers() const;
 

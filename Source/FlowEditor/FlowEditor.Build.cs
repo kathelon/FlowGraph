@@ -52,6 +52,7 @@ public class FlowEditor : ModuleRules
 			"RenderCore",
 			"Sequencer",
 			"SequencerCore",
+			"Settings",
 			"Slate",
 			"SlateCore",
 			"SourceControl",

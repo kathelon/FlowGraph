@@ -6,7 +6,8 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(FlowGraphEditorSettings)
 
 UFlowGraphEditorSettings::UFlowGraphEditorSettings()
-	: NodeDoubleClickTarget(EFlowNodeDoubleClickTarget::PrimaryAssetOrNodeDefinition)
+	: bShowWelcomeWindowOnStartup(true)
+	, NodeDoubleClickTarget(EFlowNodeDoubleClickTarget::PrimaryAssetOrNodeDefinition)
 	, bShowNodeClass(false)
 	, bShowNodeDescriptionWhilePlaying(true)
 	, bShowAddonDescriptions(true)

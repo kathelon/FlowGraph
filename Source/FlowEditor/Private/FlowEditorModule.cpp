@@ -6,8 +6,10 @@
 #include "Asset/FlowAssetEditor.h"
 #include "Asset/FlowAssetIndexer.h"
 #include "Graph/FlowGraphConnectionDrawingPolicy.h"
+#include "Graph/FlowGraphEditorSettings.h"
 #include "Graph/FlowGraphPinFactory.h"
 #include "Graph/FlowGraphSettings.h"
+#include "Utils/SFlowWelcomeWindow.h"
 #include "Utils/SLevelEditorFlow.h"
 #include "MovieScene/FlowTrackEditor.h"
 #include "Nodes/AssetTypeActions_FlowNodeBlueprint.h"
@@ -47,11 +49,14 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "EdGraphUtilities.h"
 #include "IAssetSearchModule.h"
+#include "Framework/Application/SlateApplication.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "ISequencerChannelInterface.h" // ignore Rider's false "unused include" warning
 #include "ISequencerModule.h"
 #include "LevelEditor.h"
+#include "Misc/CoreDelegates.h"
 #include "Modules/ModuleManager.h"
+#include "Widgets/SWindow.h"
 
 static FName AssetSearchModuleName = TEXT("AssetSearch");
 
@@ -91,6 +96,18 @@ void FFlowEditorModule::StartupModule()
 
 	RegisterDetailCustomizations();
 
+	if (GIsEditor && !IsRunningCommandlet())
+	{
+		if (FSlateApplication::IsInitialized())
+		{
+			TryOpenWelcomeWindow();
+		}
+		else
+		{
+			PostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FFlowEditorModule::HandlePostEngineInit);
+		}
+	}
+
 	// register asset indexers
 	if (FModuleManager::Get().IsModuleLoaded(AssetSearchModuleName))
 	{
@@ -115,6 +132,12 @@ void FFlowEditorModule::RegisterForAssetChanges()
 
 void FFlowEditorModule::ShutdownModule()
 {
+	if (PostEngineInitHandle.IsValid())
+	{
+		FCoreDelegates::OnPostEngineInit.Remove(PostEngineInitHandle);
+		PostEngineInitHandle.Reset();
+	}
+
 	FFlowEditorStyle::Shutdown();
 
 	UnregisterDetailCustomizations();
@@ -347,6 +370,46 @@ void FFlowEditorModule::OnAssetUpdated(const FAssetData& AssetData)
 void FFlowEditorModule::OnAssetRenamed(const FAssetData& AssetData, const FString& OldObjectPath)
 {
 	OnAssetUpdated(AssetData);
+}
+
+void FFlowEditorModule::HandlePostEngineInit()
+{
+	if (PostEngineInitHandle.IsValid())
+	{
+		FCoreDelegates::OnPostEngineInit.Remove(PostEngineInitHandle);
+		PostEngineInitHandle.Reset();
+	}
+
+	TryOpenWelcomeWindow();
+}
+
+void FFlowEditorModule::TryOpenWelcomeWindow()
+{
+	if (!FSlateApplication::IsInitialized())
+	{
+		return;
+	}
+
+	UFlowGraphEditorSettings* EditorSettings = GetMutableDefault<UFlowGraphEditorSettings>();
+	if (!EditorSettings || !EditorSettings->bShowWelcomeWindowOnStartup)
+	{
+		return;
+	}
+
+	const TSharedRef<SWindow> WelcomeWindow = SNew(SWindow)
+		.Title(LOCTEXT("FlowWelcomeWindowTitle", "Welcome to Flow Graph"))
+		.ClientSize(FVector2D(880.f, 520.f))
+		.SizingRule(ESizingRule::UserSized)
+		.AutoCenter(EAutoCenter::PreferredWorkArea)
+		.SupportsMaximize(false)
+		.SupportsMinimize(false)
+		[
+			SNew(SFlowWelcomeWindow)
+		];
+	FSlateApplication::Get().AddWindow(WelcomeWindow);
+
+	EditorSettings->bShowWelcomeWindowOnStartup = false;
+	EditorSettings->SaveConfig();
 }
 
 #undef LOCTEXT_NAMESPACE

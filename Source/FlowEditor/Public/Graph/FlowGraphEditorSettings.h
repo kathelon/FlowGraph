@@ -31,6 +31,10 @@ public:
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
+
+	/* Displays the welcome window once, after enabling Flow in a project. */
+	UPROPERTY(config, EditAnywhere, Category = "General")
+	bool bShowWelcomeWindowOnStartup;
 	
 	/* Double-clicking a Flow Node might open relevant asset/code editor. */
 	UPROPERTY(config, EditAnywhere, Category = "Nodes")

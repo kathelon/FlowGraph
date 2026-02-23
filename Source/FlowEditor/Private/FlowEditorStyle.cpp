@@ -54,6 +54,10 @@ void FFlowEditorStyle::Initialize()
 	StyleSet->Set("Flow.Node.Body", new BOX_BRUSH("Icons/FlowNode_Body", FMargin(16.f/64.f)));
 	StyleSet->Set("Flow.Node.ActiveShadow", new BOX_BRUSH("Icons/FlowNode_Shadow_Active", FMargin(18.0f/64.0f)));
 	StyleSet->Set("Flow.Node.WasActiveShadow", new BOX_BRUSH("Icons/FlowNode_Shadow_WasActive", FMargin(18.0f/64.0f)));
+	
+	StyleSet->Set("FlowWelcome.Docs", new IMAGE_BRUSH(TEXT("Icons/Docs"), Icon20));
+	StyleSet->Set("FlowWelcome.GitHub", new IMAGE_BRUSH(TEXT("Icons/Github"), Icon20));
+	StyleSet->Set("FlowWelcome.Discord", new IMAGE_BRUSH(TEXT("Icons/Discord"), Icon20));
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 };
