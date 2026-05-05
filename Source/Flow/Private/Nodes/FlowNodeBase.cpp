@@ -9,6 +9,7 @@
 #include "AddOns/FlowNodeAddOn.h"
 #include "Interfaces/FlowDataPinValueSupplierInterface.h"
 #include "Interfaces/FlowNamedPropertiesSupplierInterface.h"
+#include "Nodes/FlowNode.h"
 #include "Types/FlowArray.h"
 #include "Types/FlowDataPinResults.h"
 #include "Types/FlowPinTypesStandard.h"
@@ -33,10 +34,9 @@
 
 using namespace EFlowForEachAddOnFunctionReturnValue_Classifiers;
 
-UFlowNodeBase::UFlowNodeBase(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UFlowNodeBase::UFlowNodeBase()
 #if WITH_EDITORONLY_DATA
-	, GraphNode(nullptr)
+	: GraphNode(nullptr)
 	, bDisplayNodeTitleWithoutPrefix(true)
 	, bCanDelete(true)
 	, bCanDuplicate(true)
@@ -264,7 +264,7 @@ TArray<FFlowPin> UFlowNodeBase::GetContextOutputs() const
 	return ContextOutputs;
 }
 
-#endif // WITH_EDITOR
+#endif
 
 void UFlowNodeBase::LogValidationError(const FString& Message)
 {
@@ -409,7 +409,7 @@ EFlowAddOnAcceptResult UFlowNodeBase::CheckAcceptFlowNodeAddOnChild(
 
 	return CombinedResult;
 }
-#endif // WITH_EDITOR
+#endif
 
 EFlowForEachAddOnFunctionReturnValue UFlowNodeBase::ForEachAddOnConst(
 	const FConstFlowNodeAddOnFunction& Function,
@@ -622,7 +622,7 @@ void UFlowNodeBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 
 	UpdateNodeConfigText();
 }
-#endif // WITH_EDITOR
+#endif
 
 FString UFlowNodeBase::GetStatusString() const
 {
@@ -846,7 +846,7 @@ FText UFlowNodeBase::GetNodeConfigText() const
 	return DevNodeConfigText;
 #else
 	return FText::GetEmpty();
-#endif // WITH_EDITORONLY_DATA
+#endif
 }
 
 void UFlowNodeBase::SetNodeConfigText(const FText& NodeConfigText)
@@ -856,7 +856,7 @@ void UFlowNodeBase::SetNodeConfigText(const FText& NodeConfigText)
 	{
 		DevNodeConfigText = NodeConfigText;
 	}
-#endif // WITH_EDITOR
+#endif
 }
 
 void UFlowNodeBase::UpdateNodeConfigText_Implementation()
@@ -865,9 +865,21 @@ void UFlowNodeBase::UpdateNodeConfigText_Implementation()
 
 void UFlowNodeBase::LogError(FString Message, const EFlowOnScreenMessageType OnScreenMessageType) const
 {
-#if !UE_BUILD_SHIPPING
+#if !NO_LOGGING || UE_ENABLE_DEBUG_DRAWING
 	if (BuildMessage(Message))
 	{
+		// Output Log
+		UE_LOG(LogFlow, Error, TEXT("%s"), *Message);
+		
+#if WITH_EDITOR
+		if (GEditor)
+		{
+			// Message Log
+			GetFlowAsset()->GetTemplateAsset()->LogError(Message, this);
+		}
+#endif
+		
+#if UE_ENABLE_DEBUG_DRAWING
 		// OnScreen Message
 		if (OnScreenMessageType == EFlowOnScreenMessageType::Permanent)
 		{
@@ -894,16 +906,6 @@ void UFlowNodeBase::LogError(FString Message, const EFlowOnScreenMessageType OnS
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Message);
 		}
-
-		// Output Log
-		UE_LOG(LogFlow, Error, TEXT("%s"), *Message);
-
-#if WITH_EDITOR
-		if (GEditor)
-		{
-			// Message Log
-			GetFlowAsset()->GetTemplateAsset()->LogError(Message, this);
-		}
 #endif
 	}
 #endif
@@ -911,7 +913,7 @@ void UFlowNodeBase::LogError(FString Message, const EFlowOnScreenMessageType OnS
 
 void UFlowNodeBase::LogWarning(FString Message) const
 {
-#if !UE_BUILD_SHIPPING
+#if !NO_LOGGING
 	if (BuildMessage(Message))
 	{
 		// Output Log
@@ -930,7 +932,7 @@ void UFlowNodeBase::LogWarning(FString Message) const
 
 void UFlowNodeBase::LogNote(FString Message) const
 {
-#if !UE_BUILD_SHIPPING
+#if !NO_LOGGING
 	if (BuildMessage(Message))
 	{
 		// Output Log
@@ -949,7 +951,7 @@ void UFlowNodeBase::LogNote(FString Message) const
 
 void UFlowNodeBase::LogVerbose(FString Message) const
 {
-#if !UE_BUILD_SHIPPING
+#if !NO_LOGGING
 	if (BuildMessage(Message))
 	{
 		// Output Log
@@ -958,7 +960,7 @@ void UFlowNodeBase::LogVerbose(FString Message) const
 #endif
 }
 
-#if !UE_BUILD_SHIPPING
+#if !NO_LOGGING || UE_ENABLE_DEBUG_DRAWING
 bool UFlowNodeBase::BuildMessage(FString& Message) const
 {
 	const UFlowAsset* FlowAsset = GetFlowAsset();
@@ -990,6 +992,11 @@ EDataValidationResult UFlowNodeBase::ValidateNode()
 
 bool UFlowNodeBase::TryAddValueToFormatNamedArguments(const FFlowNamedDataPinProperty& NamedDataPinProperty, FFormatNamedArguments& InOutArguments) const
 {
+	if (NamedDataPinProperty.Name.IsNone() || !NamedDataPinProperty.DataPinValue.IsValid())
+	{
+		return false;
+	}
+
 	const FFlowDataPinValue& DataPinValue = NamedDataPinProperty.DataPinValue.Get();
 
 	const FFlowPinTypeName PinTypeName = DataPinValue.GetPinTypeName();

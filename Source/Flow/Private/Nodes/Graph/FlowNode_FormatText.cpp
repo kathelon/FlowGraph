@@ -9,8 +9,7 @@
 
 const FName UFlowNode_FormatText::OUTPIN_TextOutput("Formatted Text");
 
-UFlowNode_FormatText::UFlowNode_FormatText(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UFlowNode_FormatText::UFlowNode_FormatText()
 {
 #if WITH_EDITOR
 	Category = TEXT("Graph");
@@ -25,7 +24,7 @@ FFlowDataPinResult UFlowNode_FormatText::TrySupplyDataPin(FName PinName) const
 	if (PinName == OUTPIN_TextOutput)
 	{
 		FText FormattedText;
-		const EFlowDataPinResolveResult FormatResult = TryResolveFormatText(PinName, FormattedText);
+		const EFlowDataPinResolveResult FormatResult = TryResolveFormattedText(PinName, FormattedText);
 	
 		if (FlowPinType::IsSuccess(FormatResult))
 		{
@@ -40,15 +39,18 @@ FFlowDataPinResult UFlowNode_FormatText::TrySupplyDataPin(FName PinName) const
 	return Super::TrySupplyDataPin(PinName);
 }
 
-EFlowDataPinResolveResult UFlowNode_FormatText::TryResolveFormatText(const FName& PinName, FText& OutFormattedText) const
+EFlowDataPinResolveResult UFlowNode_FormatText::TryResolveFormattedText(const FName& PinName, FText& OutFormattedText) const
 {
-	if (TryFormatTextWithNamedPropertiesAsParameters(FormatText, OutFormattedText))
+	FText ResolvedFormatText = FormatText;
+	const EFlowDataPinResolveResult ResolveResult = TryResolveDataPinValue<FFlowPinType_Text>(GET_MEMBER_NAME_CHECKED(ThisClass, FormatText), ResolvedFormatText);
+
+	if (TryFormatTextWithNamedPropertiesAsParameters(ResolvedFormatText, OutFormattedText))
 	{
 		return EFlowDataPinResolveResult::Success;
 	}
 	else
 	{
-		LogError(FString::Printf(TEXT("Could not format text '%s' with properties as parameters"), *FormatText.ToString()), EFlowOnScreenMessageType::Temporary);
+		LogError(FString::Printf(TEXT("Could not format text '%s' with properties as parameters"), *ResolvedFormatText.ToString()), EFlowOnScreenMessageType::Temporary);
 
 		return EFlowDataPinResolveResult::FailedWithError;
 	}
@@ -66,10 +68,13 @@ void UFlowNode_FormatText::PostEditChangeChainProperty(FPropertyChangedChainEven
 
 void UFlowNode_FormatText::UpdateNodeConfigText_Implementation()
 {
-	constexpr bool bErrorIfInputPinNotFound = false;
-	if (IsInputConnected(GET_MEMBER_NAME_CHECKED(ThisClass, FormatText), bErrorIfInputPinNotFound))
+	constexpr bool bErrorIfInputPinNotFound = true;
+	FConnectedPin ConnectedPin;
+	const bool bIsInputConnected = FindFirstInputPinConnection(GET_MEMBER_NAME_CHECKED(ThisClass, FormatText), bErrorIfInputPinNotFound, ConnectedPin);
+
+	if (bIsInputConnected)
 	{
-		SetNodeConfigText(FText());
+		SetNodeConfigText(FText::Format(LOCTEXT("FormatTextFromPin", "Format from: {0}"), { FText::FromString(ConnectedPin.PinName.ToString()) }));
 	}
 	else
 	{

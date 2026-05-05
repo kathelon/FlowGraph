@@ -224,19 +224,12 @@ public:
 	void DispatchRootFlowCustomEvent(UFlowAsset* RootFlowInstance, const FName& EventName);
 	// ---
 
-	UE_DEPRECATED(5.5, "Please use OnRootFlowCustomEvent instead.")
-	void BP_OnTriggerRootFlowOutputEvent(UFlowAsset* RootFlowInstance, const FName& EventName);
-	
-	UE_DEPRECATED(5.5, "Please use OnRootFlowCustomEvent instead.")
-	virtual void OnTriggerRootFlowOutputEvent(UFlowAsset* RootFlowInstance, const FName& EventName);
-	
-	UE_DEPRECATED(5.5, "Please use OnTriggerRootFlowCustomOutputDispatcher instead.")
-	void OnTriggerRootFlowOutputEventDispatcher(UFlowAsset* RootFlowInstance, const FName& EventName);
-
 //////////////////////////////////////////////////////////////////////////
 // SaveGame
 
 public:
+	virtual bool CanSave() const { return true; }
+	
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
 	virtual void SaveRootFlow(TArray<FFlowAssetSaveData>& SavedFlowInstances);
 
@@ -247,7 +240,7 @@ public:
 	FFlowComponentSaveData SaveInstance();
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
-	bool LoadInstance();
+	bool LoadInstance(const UFlowSubsystem* FlowSubsystem);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SaveGame")

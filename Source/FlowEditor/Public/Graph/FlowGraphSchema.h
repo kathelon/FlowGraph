@@ -2,10 +2,9 @@
 #pragma once
 
 #include "EdGraph/EdGraphSchema.h"
-#include "Runtime/Launch/Resources/Version.h"
 #include "Templates/SubclassOf.h"
 
-#include "Asset/FlowPinTypeMatchPolicy.h"
+#include "Policies/FlowPinTypeMatchPolicy.h"
 #include "FlowGraphSchema.generated.h"
 
 class UFlowAsset;
@@ -56,12 +55,7 @@ public:
 	virtual int32 GetNodeSelectionCount(const UEdGraph* Graph) const override;
 	virtual TSharedPtr<FEdGraphSchemaAction> GetCreateCommentAction() const override;
 
-	PRAGMA_DISABLE_DEPRECATION_WARNINGS
-	virtual void OnPinConnectionDoubleCicked(UEdGraphPin* PinA, UEdGraphPin* PinB, const FVector2D& GraphPosition) const override;
-	PRAGMA_ENABLE_DEPRECATION_WARNINGS
-#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6
 	virtual void OnPinConnectionDoubleCicked(UEdGraphPin* PinA, UEdGraphPin* PinB, const FVector2f& GraphPosition) const override;
-#endif
 	
 	virtual bool IsCacheVisualizationOutOfDate(int32 InVisualizationCacheID) const override;
 	virtual int32 GetCurrentVisualizationCacheID() const override;
@@ -73,8 +67,6 @@ public:
 	// --
 
 	static const FFlowPinType* LookupDataPinTypeForPinCategory(const FName& PinCategory);
-
-	void EnsurePinTypesInitialized();
 
 	bool ArePinSubCategoryObjectsCompatible(
 		const UStruct* OutputStruct,
@@ -93,7 +85,7 @@ public:
 	 *
 	 * @return	true if the pin types are compatible.
 	 */
-	virtual bool ArePinTypesCompatible(const FEdGraphPinType& Output, const FEdGraphPinType& Input, const UClass* CallingContext = NULL, bool bIgnoreArray = false) const;
+	virtual bool ArePinTypesCompatible(const UEdGraphPin& OutputPin, const UEdGraphPin& InputPin, const UClass* CallingContext = NULL, bool bIgnoreArray = false) const;
 
 	/**
 	 * Returns the connection response for connecting PinA to PinB, which have already been determined to be compatible
@@ -124,27 +116,22 @@ public:
 
 	static bool IsPIESimulating();
 
+	static const UFlowNodeBase* GetFlowNodeBaseForPin(const UEdGraphPin& EdGraphPin);
+	static const UFlowAsset* GetFlowAssetForPin(const UEdGraphPin& EdGraphPin);
+
 protected:
 
-	/* These are the policies for matching data pin types. */
-	UPROPERTY(Transient)
-	TMap<FName, FFlowPinTypeMatchPolicy> PinTypeMatchPolicies;
-
-	/* TODO (gtaylor) The mechanism for customizing PinTypeMatchPolicies will need some revision.
-	 * I am going with a simple virtual method on schema For Now(tm) but expect a revision in how this is done, in the future. */
-	virtual void InitializedPinTypes();
-
-	static UFlowGraphNode* CreateDefaultNode(UEdGraph& Graph, const TSubclassOf<UFlowNode>& NodeClass, const FVector2D& Offset, bool bPlacedAsGhostNode);
+	static UFlowGraphNode* CreateDefaultNode(UEdGraph& Graph, const TSubclassOf<UFlowNode>& NodeClass, const FVector2f& Offset, bool bPlacedAsGhostNode);
 
 	/* Helper to break incompatible connections on a set of pins. */
 	template <bool bIsInputPins>
-	void BreakIncompatibleConnections(UFlowGraphNode_Reroute* RerouteNode, const TArray<UEdGraphPin*>& Pins, FEdGraphPinType NewType) const;
+	void BreakIncompatibleConnections(UFlowGraphNode_Reroute* RerouteNode, const TArray<UEdGraphPin*>& Pins, const UEdGraphPin& TypeFromPin) const;
 
 	/* Handles post-connection notifications for affected nodes. */
 	void NotifyNodesChanged(UFlowGraphNode* NodeA, UFlowGraphNode* NodeB, UEdGraph* Graph) const;
 
 private:
-	static void ApplyNodeOrAddOnFilter(const UFlowAsset* AssetClassDefaults, const UClass* FlowNodeClass, TArray<UFlowNodeBase*>& FilteredNodes);
+	static void ApplyNodeOrAddOnFilter(const UFlowAsset* EditedFlowAsset, const UClass* FlowNodeClass, TArray<UFlowNodeBase*>& FilteredNodes);
 	static void GetFlowNodeActions(FGraphActionMenuBuilder& ActionMenuBuilder, const UFlowAsset* EditedFlowAsset, const FString& CategoryName);
 	static TArray<UFlowNodeBase*> GetFilteredPlaceableNodesOrAddOns(const UFlowAsset* EditedFlowAsset, const TArray<UClass*>& InNativeNodesOrAddOns, const TMap<FName, FAssetData>& InBlueprintNodesOrAddOns);
 

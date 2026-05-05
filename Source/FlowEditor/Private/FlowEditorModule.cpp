@@ -53,9 +53,8 @@
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "ISequencerChannelInterface.h" // ignore Rider's false "unused include" warning
 #include "ISequencerModule.h"
-#include "LevelEditor.h"
 #include "Misc/CoreDelegates.h"
-#include "Modules/ModuleManager.h"
+#include "ToolMenus.h"
 #include "Widgets/SWindow.h"
 
 static FName AssetSearchModuleName = TEXT("AssetSearch");
@@ -82,12 +81,12 @@ void FFlowEditorModule::StartupModule()
 	// add Flow Toolbar
 	if (GetDefault<UFlowGraphSettings>()->bShowAssetToolbarAboveLevelEditor)
 	{
-		if (FLevelEditorModule* LevelEditorModule = FModuleManager::GetModulePtr<FLevelEditorModule>(TEXT("LevelEditor")))
+		UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateLambda([this]()
 		{
-			const TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
-			MenuExtender->AddToolBarExtension("Play", EExtensionHook::After, nullptr, FToolBarExtensionDelegate::CreateRaw(this, &FFlowEditorModule::CreateFlowToolbar));
-			LevelEditorModule->GetToolBarExtensibilityManager()->AddExtender(MenuExtender);
-		}
+			UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.User");
+			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("FlowEditor");
+			Section.AddEntry(FToolMenuEntry::InitWidget("FlowAssetWidget", SNew(SLevelEditorFlow), FText::GetEmpty()));
+		}));
 	}
 
 	// register Flow sequence track
@@ -113,7 +112,7 @@ void FFlowEditorModule::StartupModule()
 	{
 		RegisterAssetIndexers();
 	}
-	ModulesChangedHandle = FModuleManager::Get().OnModulesChanged().AddRaw(this, &FFlowEditorModule::ModulesChangesCallback);
+	ModulesChangedHandle = FModuleManager::Get().OnModulesChanged().AddStatic(&FFlowEditorModule::ModulesChangesCallback);
 }
 
 void FFlowEditorModule::RegisterForAssetChanges()
@@ -121,10 +120,10 @@ void FFlowEditorModule::RegisterForAssetChanges()
 	if (!bIsRegisteredForAssetChanges)
 	{
 		// Register asset change detection for search cache invalidation
-		FAssetRegistryModule& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-		AssetRegistry.Get().OnAssetUpdated().AddRaw(this, &FFlowEditorModule::OnAssetUpdated);
-		AssetRegistry.Get().OnAssetRenamed().AddRaw(this, &FFlowEditorModule::OnAssetRenamed);
-		AssetRegistry.Get().OnAssetRemoved().AddRaw(this, &FFlowEditorModule::OnAssetUpdated);
+		const FAssetRegistryModule& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+		AssetRegistry.Get().OnAssetUpdated().AddStatic(&FFlowEditorModule::OnAssetUpdated);
+		AssetRegistry.Get().OnAssetRenamed().AddStatic(&FFlowEditorModule::OnAssetRenamed);
+		AssetRegistry.Get().OnAssetRemoved().AddStatic(&FFlowEditorModule::OnAssetUpdated);
 
 		bIsRegisteredForAssetChanges = true;
 	}
@@ -276,7 +275,7 @@ void FFlowEditorModule::RegisterDetailCustomizations()
 		RegisterCustomClassLayout(UFlowNode_CustomInput::StaticClass(), FOnGetDetailCustomizationInstance::CreateStatic(&FFlowNode_CustomInputDetails::MakeInstance));
 		RegisterCustomClassLayout(UFlowNode_CustomOutput::StaticClass(), FOnGetDetailCustomizationInstance::CreateStatic(&FFlowNode_CustomOutputDetails::MakeInstance));
 		RegisterCustomClassLayout(UFlowNode_PlayLevelSequence::StaticClass(), FOnGetDetailCustomizationInstance::CreateStatic(&FFlowNode_PlayLevelSequenceDetails::MakeInstance));
-	    RegisterCustomClassLayout(UFlowNode_SubGraph::StaticClass(), FOnGetDetailCustomizationInstance::CreateStatic(&FFlowNode_SubGraphDetails::MakeInstance));
+		RegisterCustomClassLayout(UFlowNode_SubGraph::StaticClass(), FOnGetDetailCustomizationInstance::CreateStatic(&FFlowNode_SubGraphDetails::MakeInstance));
 		RegisterCustomStructLayout(*FFlowActorOwnerComponentRef::StaticStruct(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FFlowActorOwnerComponentRefCustomization::MakeInstance));
 		RegisterCustomStructLayout(*FFlowPin::StaticStruct(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FFlowPinCustomization::MakeInstance));
 		RegisterCustomStructLayout(*FFlowNamedDataPinProperty::StaticStruct(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FFlowNamedDataPinPropertyCustomization::MakeInstance));
@@ -330,7 +329,7 @@ void FFlowEditorModule::UnregisterDetailCustomizations()
 	}
 }
 
-void FFlowEditorModule::ModulesChangesCallback(const FName ModuleName, const EModuleChangeReason ReasonForChange) const
+void FFlowEditorModule::ModulesChangesCallback(const FName ModuleName, const EModuleChangeReason ReasonForChange)
 {
 	if (ReasonForChange == EModuleChangeReason::ModuleLoaded && ModuleName == AssetSearchModuleName)
 	{
@@ -338,18 +337,9 @@ void FFlowEditorModule::ModulesChangesCallback(const FName ModuleName, const EMo
 	}
 }
 
-void FFlowEditorModule::RegisterAssetIndexers() const
+void FFlowEditorModule::RegisterAssetIndexers()
 {
 	IAssetSearchModule::Get().RegisterAssetIndexer(UFlowAsset::StaticClass(), MakeUnique<FFlowAssetIndexer>());
-}
-
-void FFlowEditorModule::CreateFlowToolbar(FToolBarBuilder& ToolbarBuilder) const
-{
-	ToolbarBuilder.BeginSection("Flow");
-	{
-		ToolbarBuilder.AddWidget(SNew(SLevelEditorFlow));
-	}
-	ToolbarBuilder.EndSection();
 }
 
 TSharedRef<FFlowAssetEditor> FFlowEditorModule::CreateFlowAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, UFlowAsset* FlowAsset)
